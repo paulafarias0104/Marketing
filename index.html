@@ -1,0 +1,62 @@
+<!doctype html>
+<html lang="es">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Tibox · Mercado</title>
+  <link rel="stylesheet" href="styles.css" />
+</head>
+<body>
+  <aside class="sidebar">
+    <div class="brand">
+      <div class="brand-mark">T</div>
+      <div><strong>TIBOX</strong><span>Mercado</span></div>
+    </div>
+    <div class="sidebar-label">ESTRATEGIA Y ACTIVACIÓN</div>
+    <nav id="nav"></nav>
+    <div class="sidebar-foot">Tecnología para avanzar.<br><small>Planificación, cobertura y resultados</small></div>
+  </aside>
+
+  <div class="workspace">
+    <header class="topbar">
+      <div>
+        <span class="eyebrow">MARKETING COMMAND CENTER</span>
+        <h1 id="pageTitle">Dashboard Ejecutivo</h1>
+        <p id="pageSubtitle">Visión consolidada del plan de mercado y sus resultados.</p>
+      </div>
+      <div class="topbar-actions">
+        <label class="profile-control">Vista
+          <select id="roleSelect">
+            <option value="paula">Paula · Edición</option>
+            <option value="priscila">Priscila · Edición</option>
+            <option value="gerencia">Gerencia · Consulta</option>
+            <option value="comercial">Comercial · Consulta</option>
+          </select>
+        </label>
+        <button id="exportView" class="button">Exportar vista</button>
+      </div>
+    </header>
+    <main id="main"></main>
+  </div>
+
+  <dialog id="modal">
+    <form id="modalForm" method="dialog">
+      <div class="dialog-head">
+        <div>
+          <span class="eyebrow" id="modalEyebrow">REGISTRO</span>
+          <h2 id="modalTitle">Nuevo registro</h2>
+        </div>
+        <button type="button" id="closeModal" class="icon-button" aria-label="Cerrar">×</button>
+      </div>
+      <div id="modalFields" class="form-grid"></div>
+      <div class="dialog-actions">
+        <button type="button" id="cancelModal" class="button">Cancelar</button>
+        <button type="submit" class="button primary">Guardar</button>
+      </div>
+    </form>
+  </dialog>
+  <div id="toast" role="status" aria-live="polite"></div>
+
+  <script src="app.js"></script>
+</body>
+</html>
