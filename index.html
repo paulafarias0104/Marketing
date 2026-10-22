@@ -5,6 +5,8 @@
   <meta name="viewport" content="width=device-width,initial-scale=1" />
   <title>Tibox · Mercado</title>
   <link rel="stylesheet" href="styles.css" />
+  <link rel="stylesheet" href="v3.css" />
+  <link rel="stylesheet" href="v3-final.css" />
 </head>
 <body>
   <aside class="sidebar">
@@ -26,12 +28,7 @@
       </div>
       <div class="topbar-actions">
         <label class="profile-control">Vista
-          <select id="roleSelect">
-            <option value="paula">Paula · Edición</option>
-            <option value="priscila">Priscila · Edición</option>
-            <option value="gerencia">Gerencia · Consulta</option>
-            <option value="comercial">Comercial · Consulta</option>
-          </select>
+          <select id="roleSelect"></select>
         </label>
         <button id="exportView" class="button">Exportar vista</button>
       </div>
@@ -57,6 +54,13 @@
   </dialog>
   <div id="toast" role="status" aria-live="polite"></div>
 
-  <script src="app.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
+  <script src="v3-core.js"></script>
+  <script src="v3-dashboard-plan.js"></script>
+  <script src="v3-content.js"></script>
+  <script src="v3-events.js"></script>
+  <script src="v3-import.js"></script>
+  <script src="v3-admin.js"></script>
+  <script src="v3-final.js"></script>
 </body>
 </html>
