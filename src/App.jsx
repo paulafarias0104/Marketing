@@ -2,6 +2,7 @@ import { useState } from 'react'
 import Layout from './components/Layout'
 import Dashboard from './pages/Dashboard'
 import Plan from './pages/Plan'
+import Management from './pages/Management'
 import Communications from './pages/Communications'
 import Blog from './pages/Blog'
 import Ads from './pages/Ads'
@@ -10,10 +11,12 @@ import Webinars from './pages/Webinars'
 import Routes from './pages/Routes'
 import PointActions from './pages/PointActions'
 import Coverage from './pages/Coverage'
+import Finance from './pages/Finance'
 import Results from './pages/Results'
+import Wholesalers from './pages/Wholesalers'
 import Settings from './pages/Settings'
 
-const PAGES={dashboard:Dashboard,plan:Plan,comms:Communications,blog:Blog,ads:Ads,events:Events,webinars:Webinars,routes:Routes,point:PointActions,coverage:Coverage,results:Results,settings:Settings}
+const PAGES={dashboard:Dashboard,plan:Plan,management:Management,comms:Communications,blog:Blog,ads:Ads,events:Events,webinars:Webinars,routes:Routes,point:PointActions,coverage:Coverage,finance:Finance,results:Results,wholesalers:Wholesalers,settings:Settings}
 
 export default function App(){
   const [view,setView]=useState('dashboard')
