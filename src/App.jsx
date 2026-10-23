@@ -9,13 +9,14 @@ import Ads from './pages/Ads'
 import Events from './pages/Events'
 import Webinars from './pages/Webinars'
 import Routes from './pages/Routes'
+import Clients from './pages/Clients'
 import PointActions from './pages/PointActions'
 import Coverage from './pages/Coverage'
 import Finance from './pages/Finance'
 import Wholesalers from './pages/Wholesalers'
 import Settings from './pages/Settings'
 
-const PAGES={dashboard:Dashboard,plan:Plan,management:Management,blog:Blog,ads:Ads,events:Events,webinars:Webinars,routes:Routes,point:PointActions,coverage:Coverage,wholesalers:Wholesalers,settings:Settings}
+const PAGES={dashboard:Dashboard,plan:Plan,management:Management,blog:Blog,ads:Ads,events:Events,webinars:Webinars,routes:Routes,clients:Clients,point:PointActions,coverage:Coverage,wholesalers:Wholesalers,settings:Settings}
 const financeTab=view=>view==='finance-revenue'?'revenue':view==='finance-deals'?'deals':'general'
 const communicationsTab=view=>view==='comms-mailing'?'mailing':'rrss'
 
