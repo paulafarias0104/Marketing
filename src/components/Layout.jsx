@@ -7,7 +7,7 @@ const TOP_NAV=[
 const COMMUNICATION_CHILDREN=[['comms-rrss','RRSS'],['comms-mailing','Mailing'],['blog','Blog / SEO']]
 const MID_NAV=[['ads','◎','Ads']]
 const ACTIVATION_CHILDREN=[['events','Eventos'],['webinars','Webinars'],['routes','Rutas']]
-const BOTTOM_NAV=[['point','＋','Acciones puntuales'],['coverage','⌖','Cobertura / Visitas']]
+const BOTTOM_NAV=[['clients','👥','Clientes'],['point','＋','Acciones puntuales'],['coverage','⌖','Cobertura / Visitas']]
 const FINANCE_CHILDREN=[['finance-general','General'],['finance-revenue','Revenue atribuido'],['finance-deals','Carga de negocios']]
 const END_NAV=[['wholesalers','◈','Mayoristas'],['settings','⚙','Metas & Mantenedores']]
 const ALL_IDS=[...TOP_NAV.map(x=>x[0]),...COMMUNICATION_CHILDREN.map(x=>x[0]),...MID_NAV.map(x=>x[0]),...ACTIVATION_CHILDREN.map(x=>x[0]),...BOTTOM_NAV.map(x=>x[0]),'finance',...FINANCE_CHILDREN.map(x=>x[0]),...END_NAV.map(x=>x[0])]
@@ -16,7 +16,7 @@ const ROLE_VIEWS={
   paula:ALL_IDS,
   priscila:ALL_IDS,
   gerencia:ALL_IDS.filter(x=>x!=='settings'),
-  comercial:['dashboard','plan','management','events','webinars','routes','coverage','finance','finance-general','finance-revenue','finance-deals'],
+  comercial:['dashboard','plan','management','events','webinars','routes','clients','coverage','finance','finance-general','finance-revenue','finance-deals'],
   visor_eventos:['events'],
 }
 
