@@ -1,71 +1,14 @@
 <!doctype html>
 <html lang="es">
-<head>
-  <meta charset="utf-8" />
-  <meta name="viewport" content="width=device-width,initial-scale=1" />
-  <title>Tibox · Mercado</title>
-  <link rel="stylesheet" href="styles.css" />
-  <link rel="stylesheet" href="v3.css" />
-  <link rel="stylesheet" href="v3-final.css" />
-  <link rel="stylesheet" href="v3-live-list.css" />
-  <link rel="stylesheet" href="v3-checklist.css?v=11" />
-</head>
-<body>
-  <aside class="sidebar">
-    <div class="brand">
-      <div class="brand-mark">T</div>
-      <div><strong>TIBOX</strong><span>Mercado</span></div>
-    </div>
-    <div class="sidebar-label">ESTRATEGIA Y ACTIVACIÓN</div>
-    <nav id="nav"></nav>
-    <div class="sidebar-foot">Tecnología para avanzar.<br><small>Planificación, cobertura y resultados</small></div>
-  </aside>
-
-  <div class="workspace">
-    <header class="topbar">
-      <div>
-        <span class="eyebrow">MARKETING COMMAND CENTER</span>
-        <h1 id="pageTitle">Dashboard Ejecutivo</h1>
-        <p id="pageSubtitle">Visión consolidada del plan de mercado y sus resultados.</p>
-      </div>
-      <div class="topbar-actions">
-        <label class="profile-control">Vista
-          <select id="roleSelect"></select>
-        </label>
-        <button id="exportView" class="button">Exportar vista</button>
-      </div>
-    </header>
-    <main id="main"></main>
-  </div>
-
-  <dialog id="modal">
-    <form id="modalForm" method="dialog">
-      <div class="dialog-head">
-        <div>
-          <span class="eyebrow" id="modalEyebrow">REGISTRO</span>
-          <h2 id="modalTitle">Nuevo registro</h2>
-        </div>
-        <button type="button" id="closeModal" class="icon-button" aria-label="Cerrar">×</button>
-      </div>
-      <div id="modalFields" class="form-grid"></div>
-      <div class="dialog-actions">
-        <button type="button" id="cancelModal" class="button">Cancelar</button>
-        <button type="submit" class="button primary">Guardar</button>
-      </div>
-    </form>
-  </dialog>
-  <div id="toast" role="status" aria-live="polite"></div>
-
-  <script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
-  <script src="v3-core.js"></script>
-  <script src="v3-dashboard-plan.js"></script>
-  <script src="v3-content.js"></script>
-  <script src="v3-events.js"></script>
-  <script src="v3-import.js"></script>
-  <script src="v3-admin.js"></script>
-  <script src="v3-final.js"></script>
-  <script src="v3-list-grid.js"></script>
-  <script src="v3-live-list.js"></script>
-  <script src="v3-checklist.js?v=11"></script>
-</body>
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="theme-color" content="#011C40" />
+    <meta name="description" content="TIBOX Mercado · Planificación, activación y resultados de marketing." />
+    <title>TIBOX · Mercado</title>
+  </head>
+  <body>
+    <div id="root"></div>
+    <script type="module" src="/src/main.jsx"></script>
+  </body>
 </html>
