@@ -1,0 +1,51 @@
+import { useMarketing } from '../context/MarketingContext'
+
+const NAV=[
+  ['dashboard','▦','Dashboard'],
+  ['plan','◫','Plan de Mercado'],
+  ['comms','✦','RRSS & Mailing'],
+  ['blog','▤','Blog / SEO'],
+  ['ads','◎','Ads'],
+  ['events','◇','Eventos'],
+  ['webinars','◉','Webinars'],
+  ['routes','↗','Rutas'],
+  ['point','＋','Acciones puntuales'],
+  ['coverage','⌖','Cobertura / Visitas'],
+  ['results','$','Resultados'],
+  ['settings','⚙','Metas & Mantenedores'],
+]
+
+const ROLE_VIEWS={
+  paula:NAV.map(x=>x[0]),
+  priscila:NAV.map(x=>x[0]),
+  gerencia:NAV.filter(x=>x[0]!=='settings').map(x=>x[0]),
+  comercial:['dashboard','plan','events','webinars','routes','coverage','results'],
+  visor_eventos:['events'],
+}
+
+export default function Layout({view,setView,title,subtitle,children}){
+  const {state,setRole}=useMarketing()
+  const allowed=new Set(ROLE_VIEWS[state.role]||[])
+  const nav=NAV.filter(x=>allowed.has(x[0]))
+  const roleChange=e=>{const role=e.target.value;setRole(role);const next=(ROLE_VIEWS[role]||[])[0]||'events';setView(next)}
+  return <div className="min-h-screen bg-[#f4f7fb] text-slate-800">
+    <aside className="fixed inset-y-0 left-0 z-30 flex w-64 flex-col bg-[#011C40] text-white shadow-xl">
+      <div className="flex items-center gap-3 border-b border-white/10 px-5 py-5">
+        <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-[#FCC703] text-lg font-black text-[#011C40]">T</div>
+        <div><div className="text-lg font-black tracking-wide">TIBOX</div><div className="text-xs text-sky-200">Mercado</div></div>
+      </div>
+      <div className="px-5 pb-2 pt-5 text-[10px] font-bold tracking-[.18em] text-sky-200/70">ESTRATEGIA Y ACTIVACIÓN</div>
+      <nav className="flex-1 space-y-1 overflow-y-auto px-3 pb-4">
+        {nav.map(([id,icon,label])=><button key={id} onClick={()=>setView(id)} className={`flex w-full items-center gap-3 rounded-xl px-3 py-2.5 text-left text-sm font-semibold transition ${view===id?'bg-white text-[#011C40] shadow':'text-slate-200 hover:bg-white/10 hover:text-white'}`}><span className="w-5 text-center">{icon}</span><span>{label}</span></button>)}
+      </nav>
+      <div className="border-t border-white/10 px-5 py-4 text-xs text-sky-100/75">Tecnología para avanzar.<br/><span className="text-[11px] text-sky-100/50">Planificación, cobertura y resultados</span></div>
+    </aside>
+    <div className="ml-64 min-h-screen">
+      <header className="sticky top-0 z-20 flex items-center justify-between border-b border-slate-200 bg-white/95 px-8 py-5 backdrop-blur">
+        <div><div className="text-[10px] font-black tracking-[.18em] text-slate-400">MARKETING COMMAND CENTER</div><h1 className="mt-1 text-2xl font-black text-[#011C40]">{title}</h1><p className="mt-1 text-sm text-slate-500">{subtitle}</p></div>
+        <div className="flex items-center gap-3"><label className="text-xs font-semibold text-slate-500">Vista<select value={state.role} onChange={roleChange} className="ml-2 rounded-lg border border-slate-200 bg-white px-3 py-2 text-sm text-slate-700"><option value="paula">Paula · Edición</option><option value="priscila">Priscila · Edición</option><option value="gerencia">Gerencia · Consulta</option><option value="comercial">Comercial · Consulta</option><option value="visor_eventos">Visor Eventos · Promotora</option></select></label></div>
+      </header>
+      <main className="p-8">{children}</main>
+    </div>
+  </div>
+}
