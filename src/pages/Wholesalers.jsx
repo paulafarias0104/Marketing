@@ -7,22 +7,141 @@ import { Button, FormModal, Panel } from '../components/ui'
 const amountFmt=(value,currency='USD')=>`${currency} ${Number(value||0).toLocaleString('es-CL',{maximumFractionDigits:0})}`
 
 export default function Wholesalers({setHeader}){
-  const {state,mutate}=useMarketing();const canEdit=roleCanEdit(state.role);const [selected,setSelected]=useState(state.wholesalers?.[0]?.id||'');const [distEditor,setDistEditor]=useState(null);const [saleEditor,setSaleEditor]=useState(null);const [contactEditor,setContactEditor]=useState(null)
+  const {state,mutate}=useMarketing()
+  const canEdit=roleCanEdit(state.role)
+  const [selected,setSelected]=useState(state.wholesalers?.[0]?.id||'')
+  const [distEditor,setDistEditor]=useState(null)
+  const [saleEditor,setSaleEditor]=useState(null)
+  const [contactEditor,setContactEditor]=useState(null)
+
   setHeader('Mayoristas','Distribuidores, contactos clave y evolución trimestral de ventas por producto.')
+
   const wholesaler=state.wholesalers.find(x=>x.id===selected)||state.wholesalers[0]
-  const sales=useMemo(()=>state.wholesalerSales.filter(x=>x.wholesalerId===wholesaler?.id).sort((a,b)=>Number(b.year)-Number(a.year)||Number(b.quarter)-Number(a.quarter)||String(a.product).localeCompare(String(b.product))),[state.wholesalerSales,wholesaler?.id])
+  const sales=useMemo(()=>{
+    if(!wholesaler)return []
+    return state.wholesalerSales
+      .filter(x=>x.wholesalerId===wholesaler.id)
+      .sort((a,b)=>Number(b.year)-Number(a.year)||Number(b.quarter)-Number(a.quarter)||String(a.product).localeCompare(String(b.product)))
+  },[state.wholesalerSales,wholesaler])
   const contacts=wholesaler?.contacts||[]
-  const distFields=[{name:'name',label:'Mayorista / Distribuidor',required:true},{name:'currency',label:'Moneda',type:'select',options:['USD','CLP','UF']},{name:'notes',label:'Observaciones generales',type:'textarea',full:true}]
-  const saleFields=[{name:'year',label:'Año',type:'number',required:true},{name:'quarter',label:'Trimestre',type:'select',options:[[1,'Q1'],[2,'Q2'],[3,'Q3'],[4,'Q4']]},{name:'product',label:'Producto / Marca',required:true,full:true},{name:'amount',label:'Venta del trimestre',type:'number',step:'0.01'},{name:'currency',label:'Moneda',type:'select',options:['USD','CLP','UF']},{name:'notes',label:'Observaciones',type:'textarea',full:true}]
-  const contactFields=[{name:'name',label:'Nombre',required:true},{name:'role',label:'Cargo / Rol'},{name:'email',label:'Correo',type:'email'},{name:'phone',label:'Teléfono'},{name:'scope',label:'Qué ve / qué pedirle',type:'textarea',full:true},{name:'notes',label:'Observaciones',type:'textarea',full:true}]
-  const saveDist=raw=>mutate(s=>{if(distEditor?.id)Object.assign(s.wholesalers.find(x=>x.id===distEditor.id),raw);else{const x={id:uid('wh'),...raw,contacts:[]};s.wholesalers.push(x);setSelected(x.id)}})
-  const saveSale=raw=>mutate(s=>{const v={...raw,wholesalerId:wholesaler.id,year:+raw.year,quarter:+raw.quarter,amount:+raw.amount||0};if(saleEditor?.id)Object.assign(s.wholesalerSales.find(x=>x.id===saleEditor.id),v);else s.wholesalerSales.push({id:uid('ws'),...v})})
-  const saveContact=raw=>mutate(s=>{const w=s.wholesalers.find(x=>x.id===wholesaler.id);w.contacts=w.contacts||[];if(contactEditor?.id)Object.assign(w.contacts.find(x=>x.id===contactEditor.id),raw);else w.contacts.push({id:uid('wc'),...raw})})
+
+  const distFields=[
+    {name:'name',label:'Mayorista / Distribuidor',required:true},
+    {name:'currency',label:'Moneda',type:'select',options:['USD','CLP','UF']},
+    {name:'notes',label:'Observaciones generales',type:'textarea',full:true},
+  ]
+  const saleFields=[
+    {name:'year',label:'Año',type:'number',required:true},
+    {name:'quarter',label:'Trimestre',type:'select',options:[[1,'Q1'],[2,'Q2'],[3,'Q3'],[4,'Q4']]},
+    {name:'product',label:'Producto / Marca',required:true,full:true},
+    {name:'amount',label:'Venta del trimestre',type:'number',step:'0.01'},
+    {name:'currency',label:'Moneda',type:'select',options:['USD','CLP','UF']},
+    {name:'notes',label:'Observaciones',type:'textarea',full:true},
+  ]
+  const contactFields=[
+    {name:'name',label:'Nombre',required:true},
+    {name:'role',label:'Cargo / Rol'},
+    {name:'email',label:'Correo',type:'email'},
+    {name:'phone',label:'Teléfono'},
+    {name:'scope',label:'Qué ve / qué pedirle',type:'textarea',full:true},
+    {name:'notes',label:'Observaciones',type:'textarea',full:true},
+  ]
+
+  const saveDist=raw=>mutate(s=>{
+    if(distEditor?.id){
+      Object.assign(s.wholesalers.find(x=>x.id===distEditor.id),raw)
+    }else{
+      const x={id:uid('wh'),...raw,contacts:[]}
+      s.wholesalers.push(x)
+      setSelected(x.id)
+    }
+  })
+  const saveSale=raw=>mutate(s=>{
+    const v={...raw,wholesalerId:wholesaler.id,year:+raw.year,quarter:+raw.quarter,amount:+raw.amount||0}
+    if(saleEditor?.id)Object.assign(s.wholesalerSales.find(x=>x.id===saleEditor.id),v)
+    else s.wholesalerSales.push({id:uid('ws'),...v})
+  })
+  const saveContact=raw=>mutate(s=>{
+    const w=s.wholesalers.find(x=>x.id===wholesaler.id)
+    w.contacts=w.contacts||[]
+    if(contactEditor?.id)Object.assign(w.contacts.find(x=>x.id===contactEditor.id),raw)
+    else w.contacts.push({id:uid('wc'),...raw})
+  })
+
   return <div className="space-y-6">
-    <div className="flex flex-wrap items-center gap-2"><div className="flex flex-wrap gap-2">{state.wholesalers.map(x=><Button key={x.id} variant={x.id===wholesaler?.id?'primary':'default'} onClick={()=>setSelected(x.id)}>{x.name}</Button>)}</div><span className="flex-1"/>{canEdit&&<Button variant="primary" onClick={()=>setDistEditor({})}>+ Mayorista</Button>}{canEdit&&wholesaler&&<Button onClick={()=>setDistEditor(wholesaler)}>Editar ficha</Button>}</div>
-    {wholesaler&&<><Panel><div className="flex flex-wrap items-start gap-4"><div className="flex-1"><div className="text-xs font-bold uppercase tracking-wide text-slate-400">Mayorista</div><h2 className="mt-1 text-2xl font-black text-[#011C40]">{wholesaler.name}</h2><p className="mt-1 text-sm text-slate-500">Moneda base: {wholesaler.currency||'USD'}</p></div><div className="max-w-xl text-sm text-slate-600">{wholesaler.notes||'Sin observaciones generales.'}</div></div></Panel>
-    <Panel className="p-0"><div className="flex items-center border-b border-slate-100 p-5"><div><h2 className="text-lg font-black text-[#011C40]">Ventas por producto</h2><p className="text-sm text-slate-500">Carga manual trimestral. Semestre se compara sólo al cierre de Q2 o Q4 y si existe base suficiente.</p></div><span className="flex-1"/>{canEdit&&<Button variant="primary" onClick={()=>setSaleEditor({})}>+ Venta trimestral</Button>}</div><div className="overflow-x-auto"><table className="w-full text-sm"><thead className="bg-slate-50 text-left text-xs uppercase tracking-wide text-slate-500"><tr><th className="px-4 py-3">Período</th><th className="px-4 py-3">Producto</th><th className="px-4 py-3">Venta</th><th className="px-4 py-3">vs trim. anterior</th><th className="px-4 py-3">vs semestre anterior</th><th className="px-4 py-3">vs año anterior</th><th className="px-4 py-3">Observación</th><th/></tr></thead><tbody className="divide-y divide-slate-100">{sales.map(x=>{const c=saleComparisons(state.wholesalerSales,x);return <tr key={x.id}><td className="px-4 py-3 font-bold">Q{x.quarter} {x.year}</td><td className="px-4 py-3 font-bold text-[#011C40]">{x.product}</td><td className="px-4 py-3">{amountFmt(x.amount,x.currency||wholesaler.currency)}</td><td className="px-4 py-3">{pct(c.quarter)}</td><td className="px-4 py-3">{pct(c.semester)}</td><td className="px-4 py-3">{pct(c.year)}</td><td className="px-4 py-3 text-slate-500">{x.notes||'—'}</td><td className="px-4 py-3 text-right">{canEdit&&<Button onClick={()=>setSaleEditor(x)}>Editar</Button>}</td></tr>})}{!sales.length&&<tr><td colSpan="8" className="px-4 py-10 text-center text-slate-500">Sin ventas trimestrales cargadas.</td></tr>}</tbody></table></div></Panel>
-    <Panel className="p-0"><div className="flex items-center border-b border-slate-100 p-5"><div><h2 className="text-lg font-black text-[#011C40]">Contactos del mayorista</h2><p className="text-sm text-slate-500">Personas clave, responsabilidades y pendientes.</p></div><span className="flex-1"/>{canEdit&&<Button variant="primary" onClick={()=>setContactEditor({})}>+ Contacto</Button>}</div><div className="overflow-x-auto"><table className="w-full text-sm"><thead className="bg-slate-50 text-left text-xs uppercase tracking-wide text-slate-500"><tr><th className="px-4 py-3">Nombre</th><th className="px-4 py-3">Cargo</th><th className="px-4 py-3">Contacto</th><th className="px-4 py-3">Qué ve / qué pedirle</th><th className="px-4 py-3">Observaciones</th><th/></tr></thead><tbody className="divide-y divide-slate-100">{contacts.map(x=><tr key={x.id}><td className="px-4 py-3 font-bold text-[#011C40]">{x.name}</td><td className="px-4 py-3">{x.role||'—'}</td><td className="px-4 py-3"><div>{x.email||'—'}</div><div className="text-xs text-slate-500">{x.phone||''}</div></td><td className="px-4 py-3">{x.scope||'—'}</td><td className="px-4 py-3 text-slate-500">{x.notes||'—'}</td><td className="px-4 py-3 text-right">{canEdit&&<Button onClick={()=>setContactEditor(x)}>Editar</Button>}</td></tr>})}{!contacts.length&&<tr><td colSpan="6" className="px-4 py-10 text-center text-slate-500">Sin contactos cargados.</td></tr>}</tbody></table></div></Panel></>}
+    <div className="flex flex-wrap items-center gap-2">
+      <div className="flex flex-wrap gap-2">
+        {state.wholesalers.map(x=><Button key={x.id} variant={x.id===wholesaler?.id?'primary':'default'} onClick={()=>setSelected(x.id)}>{x.name}</Button>)}
+      </div>
+      <span className="flex-1"/>
+      {canEdit&&<Button variant="primary" onClick={()=>setDistEditor({})}>+ Mayorista</Button>}
+      {canEdit&&wholesaler&&<Button onClick={()=>setDistEditor(wholesaler)}>Editar ficha</Button>}
+    </div>
+
+    {wholesaler&&<>
+      <Panel>
+        <div className="flex flex-wrap items-start gap-4">
+          <div className="flex-1">
+            <div className="text-xs font-bold uppercase tracking-wide text-slate-400">Mayorista</div>
+            <h2 className="mt-1 text-2xl font-black text-[#011C40]">{wholesaler.name}</h2>
+            <p className="mt-1 text-sm text-slate-500">Moneda base: {wholesaler.currency||'USD'}</p>
+          </div>
+          <div className="max-w-xl text-sm text-slate-600">{wholesaler.notes||'Sin observaciones generales.'}</div>
+        </div>
+      </Panel>
+
+      <Panel className="p-0">
+        <div className="flex items-center border-b border-slate-100 p-5">
+          <div>
+            <h2 className="text-lg font-black text-[#011C40]">Ventas por producto</h2>
+            <p className="text-sm text-slate-500">Carga manual trimestral. El semestre se compara sólo al cierre de Q2 o Q4 y cuando existe base suficiente.</p>
+          </div>
+          <span className="flex-1"/>
+          {canEdit&&<Button variant="primary" onClick={()=>setSaleEditor({})}>+ Venta trimestral</Button>}
+        </div>
+        <div className="overflow-x-auto">
+          <table className="w-full text-sm">
+            <thead className="bg-slate-50 text-left text-xs uppercase tracking-wide text-slate-500">
+              <tr><th className="px-4 py-3">Período</th><th className="px-4 py-3">Producto</th><th className="px-4 py-3">Venta</th><th className="px-4 py-3">vs trim. anterior</th><th className="px-4 py-3">vs semestre anterior</th><th className="px-4 py-3">vs año anterior</th><th className="px-4 py-3">Observación</th><th/></tr>
+            </thead>
+            <tbody className="divide-y divide-slate-100">
+              {sales.map(x=>{
+                const c=saleComparisons(state.wholesalerSales,x)
+                return <tr key={x.id}>
+                  <td className="px-4 py-3 font-bold">Q{x.quarter} {x.year}</td>
+                  <td className="px-4 py-3 font-bold text-[#011C40]">{x.product}</td>
+                  <td className="px-4 py-3">{amountFmt(x.amount,x.currency||wholesaler.currency)}</td>
+                  <td className="px-4 py-3">{pct(c.quarter)}</td>
+                  <td className="px-4 py-3">{pct(c.semester)}</td>
+                  <td className="px-4 py-3">{pct(c.year)}</td>
+                  <td className="px-4 py-3 text-slate-500">{x.notes||'—'}</td>
+                  <td className="px-4 py-3 text-right">{canEdit&&<Button onClick={()=>setSaleEditor(x)}>Editar</Button>}</td>
+                </tr>
+              })}
+              {!sales.length&&<tr><td colSpan="8" className="px-4 py-10 text-center text-slate-500">Sin ventas trimestrales cargadas.</td></tr>}
+            </tbody>
+          </table>
+        </div>
+      </Panel>
+
+      <Panel className="p-0">
+        <div className="flex items-center border-b border-slate-100 p-5">
+          <div><h2 className="text-lg font-black text-[#011C40]">Contactos del mayorista</h2><p className="text-sm text-slate-500">Personas clave, responsabilidades y pendientes.</p></div>
+          <span className="flex-1"/>
+          {canEdit&&<Button variant="primary" onClick={()=>setContactEditor({})}>+ Contacto</Button>}
+        </div>
+        <div className="overflow-x-auto">
+          <table className="w-full text-sm">
+            <thead className="bg-slate-50 text-left text-xs uppercase tracking-wide text-slate-500"><tr><th className="px-4 py-3">Nombre</th><th className="px-4 py-3">Cargo</th><th className="px-4 py-3">Contacto</th><th className="px-4 py-3">Qué ve / qué pedirle</th><th className="px-4 py-3">Observaciones</th><th/></tr></thead>
+            <tbody className="divide-y divide-slate-100">
+              {contacts.map(x=><tr key={x.id}><td className="px-4 py-3 font-bold text-[#011C40]">{x.name}</td><td className="px-4 py-3">{x.role||'—'}</td><td className="px-4 py-3"><div>{x.email||'—'}</div><div className="text-xs text-slate-500">{x.phone||''}</div></td><td className="px-4 py-3">{x.scope||'—'}</td><td className="px-4 py-3 text-slate-500">{x.notes||'—'}</td><td className="px-4 py-3 text-right">{canEdit&&<Button onClick={()=>setContactEditor(x)}>Editar</Button>}</td></tr>)}
+              {!contacts.length&&<tr><td colSpan="6" className="px-4 py-10 text-center text-slate-500">Sin contactos cargados.</td></tr>}
+            </tbody>
+          </table>
+        </div>
+      </Panel>
+    </>}
+
     <FormModal open={!!distEditor} title={distEditor?.id?'Editar mayorista':'Nuevo mayorista'} eyebrow="MAYORISTA" fields={distFields} initial={distEditor?.id?distEditor:{name:'',currency:'USD',notes:''}} onClose={()=>setDistEditor(null)} onSave={saveDist}/>
     <FormModal open={!!saleEditor} title={saleEditor?.id?'Editar venta trimestral':'Nueva venta trimestral'} eyebrow="VENTAS MAYORISTA" fields={saleFields} initial={saleEditor?.id?saleEditor:{year:2026,quarter:1,product:'Microsoft',amount:0,currency:wholesaler?.currency||'USD',notes:''}} onClose={()=>setSaleEditor(null)} onSave={saveSale}/>
     <FormModal open={!!contactEditor} title={contactEditor?.id?'Editar contacto':'Nuevo contacto'} eyebrow="CONTACTOS" fields={contactFields} initial={contactEditor?.id?contactEditor:{name:'',role:'',email:'',phone:'',scope:'',notes:''}} onClose={()=>setContactEditor(null)} onSave={saveContact}/>
