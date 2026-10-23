@@ -1,37 +1,89 @@
-# Tibox · App de Mercado
+# TIBOX Mercado
 
-MVP funcional para planificar, ejecutar y medir la estrategia de Mercado de Tibox.
+Aplicación de planificación y gestión de Mercado y Marketing para TIBOX.
 
-## Alcance incluido
+## Stack
 
-- Dashboard ejecutivo con filtros por año, trimestre, línea y objetivo.
-- Matriz de presión de mercado por línea/canal.
-- Plan de Mercado e iniciativas/campañas.
-- Estados: Idea, Planificada, En ejecución, En pausa, Ejecutada, En seguimiento y Cerrada.
-- Objetivos: Captación, Desarrollo de cartera y Fidelización.
-- Audiencias: Masivo, Prospectos, Clientes · todos los usuarios y Clientes · contactos clave.
-- Eventos integrados con asistentes, checklist pre/post, Live, itinerario, regalos y seguimiento comercial.
-- La antigua vista **Anfitriona** se simplifica como filtro **Viene llegando** en Asistentes.
-- Rutas IA con histórico 2025–2026 cargado como base.
-- Webinars con inscritos, asistencia, seguimiento y resultados.
-- Historial transversal por persona y empresa.
-- Carga manual mensual de resultados/negocios comisionados.
-- Metas trimestrales y mantenedores de canales/accionables.
-- Exportación CSV desde cualquier módulo respetando la vista actual.
-- Perfiles de edición (Paula / Priscila) y consulta (Gerencia / Comercial) para validar UX.
+- React 19.3
+- Vite 8
+- JavaScript / JSX
+- Tailwind CSS 4
+- SheetJS (`xlsx`) para plantillas e importación Excel
+- Persistencia local mediante `localStorage` en esta etapa de prototipo
 
-## Uso local
-
-Es una SPA estática. Puede abrirse directamente o servirse con cualquier servidor web.
+## Desarrollo local
 
 ```bash
-python -m http.server 8080
+npm install
+npm run dev
 ```
 
-Luego abrir `http://localhost:8080`.
+Vite mostrará la URL local de desarrollo, normalmente `http://localhost:5173`.
 
-## Persistencia del MVP
+## Build de producción
 
-Esta primera versión guarda los cambios en `localStorage` del navegador. Esto permite validar funcionalidad y flujo sin depender aún de una base de datos.
+```bash
+npm run build
+npm run preview
+```
 
-Para operación multiusuario real, el siguiente paso es conectar el front a una API/base central y reemplazar el selector de perfil por autenticación corporativa. Los módulos y el modelo visual ya quedan preparados para esa evolución.
+El resultado compilado se genera en `dist/`.
+
+## Docker
+
+```bash
+docker build -t tibox-marketing .
+docker run -p 8080:80 tibox-marketing
+```
+
+## Estructura principal
+
+```text
+src/
+  components/          UI reutilizable y layout
+  context/             Estado global y persistencia
+  data/                Datos semilla, mantenedores y checklist base
+  lib/                 Utilidades
+  pages/               Módulos funcionales
+    events/             Eventos, Live y Checklist
+```
+
+## Módulos
+
+- Dashboard Ejecutivo
+- Plan de Mercado
+- RRSS & Mailing
+- Blog / SEO
+- Ads
+- Eventos
+  - Resumen
+  - Asistentes
+  - Checklist Antes / Post evento
+  - Live en lista
+  - Operación
+  - Costos
+  - Seguimiento
+- Webinars
+- Rutas
+- Acciones puntuales
+- Cobertura / Visitas
+- Resultados
+- Metas & Mantenedores
+
+## Migración desde la versión anterior
+
+La app React usa la clave `tibox_marketing_react_v4`. Si no existe, intenta leer automáticamente `tibox_marketing_v3` y normalizar los datos al nuevo modelo, de modo que la migración conserve los datos cargados en el navegador.
+
+## Roles del prototipo
+
+- Paula · Edición
+- Priscila · Edición
+- Gerencia · Consulta
+- Comercial · Consulta
+- Visor Eventos · Promotora
+
+> Nota: el selector de roles es una simulación de interfaz. Todavía no constituye autenticación ni autorización segura. Para producción se debe conectar a un backend con usuarios, permisos y base de datos central.
+
+## Archivos legacy
+
+Los archivos `v3-*.js`, `v3-*.css`, `app.js`, `plan-v2.*` y similares pertenecen a la maqueta JavaScript anterior y ya no son cargados por `index.html`. Se mantienen temporalmente como referencia histórica durante la migración.
