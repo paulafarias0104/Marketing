@@ -1,0 +1,74 @@
+import { useMemo, useRef, useState } from 'react'
+import * as XLSX from 'xlsx'
+import { useMarketing } from '../context/MarketingContext'
+import { MONTHS } from '../data/seed'
+import { actionTypeById, fmtDate, lineById, monthOf, planItems, quarterOf, statusMeta, yearOf, uid } from '../lib/utils'
+import { Button, Empty, FormModal, Panel, StatusBadge } from '../components/ui'
+
+export default function Plan({setHeader}){
+  const {state,mutate}=useMarketing()
+  const [year,setYear]=useState(2026)
+  const [month,setMonth]=useState(10)
+  const [mode,setMode]=useState('month')
+  const [type,setType]=useState('all')
+  const [editor,setEditor]=useState(false)
+  const fileRef=useRef(null)
+  setHeader('Plan de Mercado','Calendario maestro: RRSS, mailing, blog, Ads, eventos, webinars, rutas y acciones puntuales.')
+
+  const items=useMemo(()=>planItems(state)
+    .filter(x=>yearOf(x.date)===year)
+    .filter(x=>mode==='year'||mode==='quarter'||monthOf(x.date)===month)
+    .filter(x=>mode!=='quarter'||quarterOf(x.date)===Math.ceil(month/3))
+    .filter(x=>type==='all'||x.type===type),[state,year,month,mode,type])
+
+  const createAction=raw=>{
+    const id=uid(raw.type);const common={id,date:raw.date,status:raw.status||'planned',line:raw.line,service:raw.service||''}
+    mutate(s=>{
+      if(raw.type==='rrss')s.social.push({...common,title:raw.name,network:'LinkedIn',postType:'Imagen fija',owner:'Priscila',campaign:'',url:'',notes:''})
+      else if(raw.type==='mailing')s.mailings.push({...common,title:raw.name,subject:'',audience:'Clientes y prospectos',segment:'',owner:'Priscila',sent:0,opens:0,clicks:0,leads:0})
+      else if(raw.type==='blog')s.blogs.push({...common,title:raw.name,keyword:'',owner:'Priscila',url:'',visits:0,leads:0})
+      else if(raw.type==='ads')s.ads.push({...common,name:raw.name,start:raw.date,end:raw.date,platform:'Google Ads',budget:0,actual:0,impressions:0,clicks:0,leads:0,opps:0,sales:0,sold:0})
+      else if(raw.type==='event')s.events.push({...common,name:raw.name,format:'Presencial',endDate:'',city:'',place:'',sponsor:'',budget:0,supplier:0,costs:{traslado:0,catering:0,regalos:0,lugar:0,material:0,otro:0},tasks:[],agenda:[],gifts:[]})
+      else if(raw.type==='webinar')s.webinars.push({...common,name:raw.name,speaker:'',registered:0,attended:0,opps:0,sales:0,sold:0})
+      else if(raw.type==='route')s.routes.push({...common,company:raw.name,city:'',topic:raw.service||'',attendees:0,costs:{traslado:0,regalos:0,otro:0},opps:0,sales:0,sold:0,notes:''})
+      else s.pointActions.push({...common,title:raw.name,kind:'Otro',owner:'Priscila',notes:''})
+    })
+  }
+
+  const downloadTemplate=()=>{
+    const rows=[{Tipo:'RRSS',Fecha:'2026-11-10',Nombre:'Publicación ejemplo',Linea:'soc',Servicio:'SOC 24x7',Estado:'planned'},{Tipo:'Evento',Fecha:'2026-11-18',Nombre:'Evento ejemplo',Linea:'infra-ti',Servicio:'Infraestructura TI',Estado:'planned'}]
+    const wb=XLSX.utils.book_new();XLSX.utils.book_append_sheet(wb,XLSX.utils.json_to_sheet(rows),'Plan');XLSX.writeFile(wb,'Plantilla_Plan_Mercado_TIBOX.xlsx')
+  }
+
+  const importExcel=async file=>{
+    const data=await file.arrayBuffer();const wb=XLSX.read(data);const rows=XLSX.utils.sheet_to_json(wb.Sheets[wb.SheetNames[0]],{defval:''})
+    const map={'rrss':'rrss','mailing':'mailing','blog':'blog','blog / seo':'blog','ads':'ads','evento':'event','webinar':'webinar','ruta':'route','acción puntual':'point','accion puntual':'point'}
+    rows.forEach(r=>{const kind=map[String(r.Tipo||r.tipo||'').trim().toLowerCase()];if(!kind)return;createAction({type:kind,date:String(r.Fecha||r.fecha||'').slice(0,10),name:r.Nombre||r.nombre||r.Accion||r.accion||'Sin nombre',line:r.Linea||r.linea||state.config.lines[0]?.id||'',service:r.Servicio||r.servicio||'',status:r.Estado||r.estado||'planned'})})
+  }
+
+  const days=mode==='month'?Array.from({length:new Date(year,month,0).getDate()},(_,i)=>i+1):[]
+  const fields=[
+    {name:'type',label:'Tipo',type:'select',options:state.config.actionTypes.map(x=>[x.id,`${x.icon} ${x.label}`])},
+    {name:'date',label:'Fecha',type:'date',required:true},
+    {name:'name',label:'Nombre / Acción',required:true,full:true},
+    {name:'line',label:'Línea',type:'select',options:state.config.lines.map(x=>[x.id,x.name])},
+    {name:'service',label:'Servicio / Tema'},
+    {name:'status',label:'Estado',type:'select',options:[['idea','Idea'],['planned','Planificado'],['running','En ejecución'],['paused','En pausa'],['done','Ejecutado'],['closed','Cerrado']]},
+  ]
+
+  return <div className="space-y-5">
+    <div className="flex flex-wrap items-center gap-2">
+      <select value={year} onChange={e=>setYear(+e.target.value)} className="rounded-lg border border-slate-200 bg-white px-3 py-2 text-sm font-semibold">{[2026,2027,2028].map(y=><option key={y}>{y}</option>)}</select>
+      <select value={month} onChange={e=>setMonth(+e.target.value)} className="rounded-lg border border-slate-200 bg-white px-3 py-2 text-sm font-semibold">{MONTHS.map((m,i)=><option key={m} value={i+1}>{m}</option>)}</select>
+      <div className="inline-flex rounded-lg border border-slate-200 bg-white p-1">{[['month','Mes'],['quarter','Trimestre'],['year','Año']].map(([v,l])=><button key={v} onClick={()=>setMode(v)} className={`rounded-md px-3 py-1.5 text-sm font-semibold ${mode===v?'bg-[#011C40] text-white':'text-slate-600'}`}>{l}</button>)}</div>
+      <select value={type} onChange={e=>setType(e.target.value)} className="rounded-lg border border-slate-200 bg-white px-3 py-2 text-sm"><option value="all">Todos los tipos</option>{state.config.actionTypes.map(x=><option key={x.id} value={x.id}>{x.icon} {x.label}</option>)}</select>
+      <span className="flex-1"/><Button onClick={downloadTemplate}>Plantilla Excel</Button><Button onClick={()=>fileRef.current?.click()}>Importar Excel</Button><input ref={fileRef} type="file" accept=".xlsx,.xls,.csv" className="hidden" onChange={e=>e.target.files?.[0]&&importExcel(e.target.files[0])}/><Button variant="primary" onClick={()=>setEditor(true)}>+ Nueva acción</Button>
+    </div>
+    {mode==='month'?<div className="grid grid-cols-7 overflow-hidden rounded-2xl border border-slate-200 bg-slate-200 shadow-sm">
+      {['Lun','Mar','Mié','Jue','Vie','Sáb','Dom'].map(d=><div key={d} className="bg-[#011C40] px-3 py-2 text-center text-xs font-bold text-white">{d}</div>)}
+      {Array.from({length:(new Date(year,month-1,1).getDay()+6)%7}).map((_,i)=><div key={`blank-${i}`} className="min-h-32 bg-slate-50"/>)}
+      {days.map(day=>{const date=`${year}-${String(month).padStart(2,'0')}-${String(day).padStart(2,'0')}`;const rows=items.filter(x=>x.date===date);return <div key={day} className="min-h-32 bg-white p-2"><div className="mb-2 text-xs font-bold text-slate-400">{day}</div><div className="space-y-1.5">{rows.map(x=>{const t=actionTypeById(state,x.type),s=statusMeta(x);return <div key={`${x.type}-${x.id}`} className="rounded-lg border px-2 py-1.5 text-[11px] font-semibold leading-tight" style={{borderLeft:`4px solid ${lineById(state,x.line)?.color||t.color}`,backgroundColor:`${t.color}0d`}}><span className="mr-1">{t.icon}</span>{x.name}<div className="mt-1 text-[10px] font-medium text-slate-500">{s.icon} {s.label}</div></div>})}</div></div>})}
+    </div>:<Panel><div className="divide-y divide-slate-100">{items.length?items.map(x=>{const t=actionTypeById(state,x.type);return <div key={`${x.type}-${x.id}`} className="flex items-center gap-4 py-3"><div className="flex h-10 w-10 items-center justify-center rounded-xl" style={{backgroundColor:`${t.color}20`}}>{t.icon}</div><div className="min-w-0 flex-1"><div className="font-bold text-slate-800">{x.name}</div><div className="text-xs text-slate-500">{fmtDate(x.date)} · {lineById(state,x.line)?.name||'Sin línea'} · {x.service||''}</div></div><StatusBadge item={x}/></div>}):<Empty/>}</div></Panel>}
+    <FormModal open={editor} title="Nueva acción del Plan" eyebrow="PLAN DE MERCADO" initial={{type:'rrss',date:`${year}-${String(month).padStart(2,'0')}-01`,name:'',line:state.config.lines[0]?.id||'',service:'',status:'planned'}} fields={fields} onClose={()=>setEditor(false)} onSave={createAction}/>
+  </div>
+}
