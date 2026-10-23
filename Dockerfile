@@ -1,8 +1,11 @@
-FROM python:3.12-slim
+FROM node:22-alpine AS build
 WORKDIR /app
+COPY package*.json ./
+RUN npm install
 COPY . .
-RUN useradd -r marketing && chown -R marketing:marketing /app
-USER marketing
-ENV PORT=8080
-EXPOSE 8080
-CMD ["python", "server.py"]
+RUN npm run build
+
+FROM nginx:1.27-alpine
+COPY --from=build /app/dist /usr/share/nginx/html
+EXPOSE 80
+CMD ["nginx", "-g", "daemon off;"]
