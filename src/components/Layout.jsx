@@ -1,11 +1,11 @@
 import { useMarketing } from '../context/MarketingContext'
 
 const NAV=[
-  ['dashboard','▦','Dashboard'],['plan','◫','Plan de Mercado'],['management','✓','Gestiones'],['comms','✦','RRSS & Mailing'],['blog','▤','Blog / SEO'],['ads','◎','Ads'],['events','◇','Eventos'],['webinars','◉','Webinars'],['routes','↗','Rutas'],['point','＋','Acciones puntuales'],['coverage','⌖','Cobertura / Visitas'],['finance','$','Presupuesto / Finanzas'],['results','↗','Revenue atribuido'],['wholesalers','◈','Mayoristas'],['settings','⚙','Metas & Mantenedores'],
+  ['dashboard','▦','Dashboard'],['plan','◫','Plan de Mercado'],['management','✓','Gestiones'],['comms','✦','RRSS & Mailing'],['blog','▤','Blog / SEO'],['ads','◎','Ads'],['events','◇','Eventos'],['webinars','◉','Webinars'],['routes','↗','Rutas'],['point','＋','Acciones puntuales'],['coverage','⌖','Cobertura / Visitas'],['finance','$','Presupuesto / Finanzas'],['wholesalers','◈','Mayoristas'],['settings','⚙','Metas & Mantenedores'],
 ]
 
 const ROLE_VIEWS={
-  paula:NAV.map(x=>x[0]),priscila:NAV.map(x=>x[0]),gerencia:NAV.filter(x=>x[0]!=='settings').map(x=>x[0]),comercial:['dashboard','plan','management','events','webinars','routes','coverage','results'],visor_eventos:['events'],
+  paula:NAV.map(x=>x[0]),priscila:NAV.map(x=>x[0]),gerencia:NAV.filter(x=>x[0]!=='settings').map(x=>x[0]),comercial:['dashboard','plan','management','events','webinars','routes','coverage','finance'],visor_eventos:['events'],
 }
 
 export default function Layout({view,setView,title,subtitle,children}){
