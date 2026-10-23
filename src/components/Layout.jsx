@@ -89,10 +89,6 @@ export default function Layout({view,setView,title,subtitle,children}){
         <div className="my-3 border-t border-white/10"/>
         {END_NAV.filter(x=>allowed.has(x[0])).map(([id,icon,label])=><NavButton key={id} active={view===id} icon={icon} label={label} onClick={()=>setView(id)}/>)}
       </nav>
-      <div className="relative m-3 rounded-2xl border border-white/10 bg-white/7 p-4 backdrop-blur">
-        <div className="text-xs font-bold text-white">Tecnología para avanzar.</div>
-        <div className="mt-1 text-[11px] leading-5 text-white/48">Planificación, cobertura y resultados en una sola vista.</div>
-      </div>
     </aside>
     <div className="ml-[270px] min-h-screen">
       <header className="sticky top-0 z-20 px-7 pt-5">
