@@ -15,6 +15,7 @@ import Coverage from './pages/Coverage'
 import Finance from './pages/Finance'
 import Wholesalers from './pages/Wholesalers'
 import Settings from './pages/Settings'
+import Mailing from './pages/Mailing'
 
 const PAGES={dashboard:Dashboard,plan:Plan,management:Management,blog:Blog,ads:Ads,events:Events,webinars:Webinars,routes:Routes,clients:Clients,point:PointActions,coverage:Coverage,wholesalers:Wholesalers,settings:Settings}
 const financeTab=view=>view==='finance-revenue'?'revenue':view==='finance-deals'?'deals':'general'
@@ -23,13 +24,14 @@ const communicationsTab=view=>view==='comms-mailing'?'mailing':'rrss'
 export default function App(){
   const [view,setView]=useState('dashboard')
   const [header,setHeaderState]=useState({title:'Dashboard Ejecutivo',subtitle:'Visión consolidada del plan de mercado y sus resultados.'})
+  const isMailing=view==='mailing-commercial'||view==='mailing-technical'
   const isFinance=view==='finance'||view.startsWith('finance-')
   const isCommunications=view==='comms'||view.startsWith('comms-')
-  const Page=isFinance?Finance:isCommunications?Communications:(PAGES[view]||Dashboard)
+  const Page=isMailing?Mailing:isFinance?Finance:isCommunications?Communications:(PAGES[view]||Dashboard)
   const setHeader=(title,subtitle)=>{if(header.title!==title||header.subtitle!==subtitle)queueMicrotask(()=>setHeaderState({title,subtitle}))}
   const onFinanceTabChange=tab=>setView(tab==='revenue'?'finance-revenue':tab==='deals'?'finance-deals':'finance-general')
   const onCommunicationsTabChange=tab=>setView(tab==='mailing'?'comms-mailing':'comms-rrss')
   return <Layout view={view} setView={setView} title={header.title} subtitle={header.subtitle}>
-    <Page key={view} setHeader={setHeader} {...(isFinance?{initialTab:financeTab(view),onTabChange:onFinanceTabChange}:isCommunications?{initialTab:communicationsTab(view),onTabChange:onCommunicationsTabChange}:{})}/>
+    <Page key={view} setHeader={setHeader} {...(isMailing?{kind:view==='mailing-technical'?'technical':'commercial'}:isFinance?{initialTab:financeTab(view),onTabChange:onFinanceTabChange}:isCommunications?{initialTab:communicationsTab(view),onTabChange:onCommunicationsTabChange}:{})}/>
   </Layout>
 }
