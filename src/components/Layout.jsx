@@ -4,7 +4,7 @@ import { useMarketing } from '../context/MarketingContext'
 const TOP_NAV=[
   ['dashboard','▦','Dashboard'],['plan','◫','Plan de Mercado'],['management','✓','Gestiones'],
 ]
-const COMMUNICATION_CHILDREN=[['comms-rrss','RRSS'],['comms-mailing','Mailing'],['blog','Blog / SEO']]
+const COMMUNICATION_CHILDREN=[['comms-rrss','RRSS'],['comms-mailing','Registro de mailings'],['mailing-commercial','Mailing Comercial'],['mailing-technical','Mailing Técnico'],['blog','Blog / SEO']]
 const MID_NAV=[['ads','◎','Ads']]
 const ACTIVATION_CHILDREN=[['events','Eventos'],['webinars','Webinars'],['routes','Rutas']]
 const BOTTOM_NAV=[['clients','👥','Clientes'],['point','＋','Acciones puntuales'],['coverage','⌖','Cobertura / Visitas']]
@@ -43,11 +43,11 @@ function GroupChildren({childrenItems,allowed,view,setView}){
 
 export default function Layout({view,setView,title,subtitle,children}){
   const {state,setRole}=useMarketing()
-  const [communicationsOpen,setCommunicationsOpen]=useState(()=>view==='blog'||view==='comms'||view.startsWith('comms-'))
+  const [communicationsOpen,setCommunicationsOpen]=useState(()=>view==='blog'||view==='comms'||(view.startsWith('comms-')||view.startsWith('mailing-')))
   const [activationsOpen,setActivationsOpen]=useState(()=>['events','webinars','routes'].includes(view))
   const [financeOpen,setFinanceOpen]=useState(()=>view.startsWith('finance'))
   const allowed=new Set(ROLE_VIEWS[state.role]||[])
-  const isCommunications=view==='blog'||view==='comms'||view.startsWith('comms-')
+  const isCommunications=view==='blog'||view==='comms'||(view.startsWith('comms-')||view.startsWith('mailing-'))
   const isActivations=['events','webinars','routes'].includes(view)
   const isFinance=view==='finance'||view.startsWith('finance-')
   const showCommunications=COMMUNICATION_CHILDREN.some(x=>allowed.has(x[0]))
